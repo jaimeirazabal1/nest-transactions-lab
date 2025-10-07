@@ -50,16 +50,69 @@ docker-compose up -d
 npm run seed:run
 
 # 5. La aplicación estará disponible en:
-# http://localhost:3000
+# http://localhost:4000
 ```
 
-### Sin Docker
+### Ejecutar sin Docker (opcional)
 
 ```bash
 # 1. Instalar PostgreSQL localmente
 # 2. Crear base de datos: certifications_db
-# 3. Configurar variables de entorno en .env
+# 3. Configurar variables de entorno en .env (ejemplo)
+#    DB_HOST=127.0.0.1
+#    DB_PORT=5432
+#    DB_USERNAME=postgres
+#    DB_PASSWORD=postgres123
+#    DB_DATABASE=certifications_db
+#    NODE_ENV=development
 # 4. npm run start:dev
+
+## ✅ Pasos para probar el laboratorio
+
+1) Levantar infraestructura y app (Docker):
+   - docker-compose up -d
+   - docker-compose logs -f app (verifica que Nest inició sin errores)
+
+2) Ejecutar seeds de datos:
+   - npm run seed:run
+
+3) Probar caso exitoso (todas las personas se crean):
+   - curl -X POST http://localhost:4000/api/v1/certifications \
+     -H "Content-Type: application/json" \
+     -d '{
+       "title": "Curso de NestJS Avanzado",
+       "institution": "Academia Tech",
+       "issueDate": "2024-01-15",
+       "description": "Certificación del curso avanzado de NestJS",
+       "persons": [
+         {"fullName":"María González","email":"maria@email.com","role":"Estudiante"},
+         {"fullName":"Carlos López","email":"carlos@email.com","role":"Estudiante"},
+         {"fullName":"Ana Martínez","email":"ana@email.com","role":"Instructor"},
+         {"fullName":"Pedro Sánchez","email":"pedro@email.com","role":"Estudiante"},
+         {"fullName":"Laura Díaz","email":"laura@email.com","role":"Estudiante"}
+       ]
+     }'
+
+4) Probar caso de error (simular fallo en la 5ta persona → rollback total):
+   - curl -X POST http://localhost:4000/api/v1/certifications/simulate-error \
+     -H "Content-Type: application/json" \
+     -d '{
+       "title": "Curso de NestJS Avanzado",
+       "institution": "Academia Tech",
+       "issueDate": "2024-01-15",
+       "description": "Certificación del curso avanzado de NestJS",
+       "persons": [
+         {"fullName":"María González","email":"maria@email.com","role":"Estudiante"},
+         {"fullName":"Carlos López","email":"carlos@email.com","role":"Estudiante"},
+         {"fullName":"Ana Martínez","email":"ana@email.com","role":"Instructor"},
+         {"fullName":"Pedro Sánchez","email":"pedro@email.com","role":"Estudiante"},
+         {"fullName":"Laura Díaz","email":"laura@email.com","role":"Estudiante"}
+       ]
+     }'
+
+5) Consultar datos:
+   - curl http://localhost:4000/api/v1/certifications
+   - curl http://localhost:4000/api/v1/persons
 ```
 
 ## 🧪 Escenarios de Prueba
@@ -69,7 +122,7 @@ npm run seed:run
 Crear una certificación con 5 participantes exitosamente:
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/certifications \
+curl -X POST http://localhost:4000/api/v1/certifications \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Curso de NestJS Avanzado",
@@ -117,7 +170,7 @@ curl -X POST http://localhost:3000/api/v1/certifications \
 Simular fallo en la 5ta persona para demostrar rollback:
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/certifications/simulate-error \
+curl -X POST http://localhost:4000/api/v1/certifications/simulate-error \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Curso de NestJS Avanzado",
@@ -168,16 +221,16 @@ curl -X POST http://localhost:3000/api/v1/certifications/simulate-error \
 |--------|----------|-------------|
 | `POST` | `/api/v1/certifications` | Crear certificación con personas (caso exitoso) |
 | `POST` | `/api/v1/certifications/simulate-error` | Crear certificación simulando error (demostrar rollback) |
-| `GET` | `/api/v1/certifications` | Obtener todas las certificaciones |
-| `GET` | `/api/v1/certifications/:id` | Obtener certificación específica |
+| `GET`  | `/api/v1/certifications` | Obtener todas las certificaciones |
+| `GET`  | `/api/v1/certifications/:id` | Obtener certificación específica |
 
 ### Personas
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| `GET` | `/api/v1/persons` | Obtener todas las personas |
-| `GET` | `/api/v1/persons/:id` | Obtener persona específica |
-| `GET` | `/api/v1/persons/certification/:id` | Obtener personas de una certificación |
+| `GET`  | `/api/v1/persons` | Obtener todas las personas |
+| `GET`  | `/api/v1/persons/:id` | Obtener persona específica |
+| `GET`  | `/api/v1/persons/certification/:id` | Obtener personas de una certificación |
 
 ## 🔍 Consultas Útiles
 
@@ -185,20 +238,20 @@ curl -X POST http://localhost:3000/api/v1/certifications/simulate-error \
 
 ```bash
 # Verificar certificaciones
-curl http://localhost:3000/api/v1/certifications
+curl http://localhost:4000/api/v1/certifications
 
 # Verificar personas
-curl http://localhost:3000/api/v1/persons
+curl http://localhost:4000/api/v1/persons
 ```
 
 ### Verificar datos después de creación exitosa
 
 ```bash
 # Obtener todas las certificaciones
-curl http://localhost:3000/api/v1/certifications
+curl http://localhost:4000/api/v1/certifications
 
 # Obtener una certificación específica (reemplaza :id)
-curl http://localhost:3000/api/v1/certifications/:id
+curl http://localhost:4000/api/v1/certifications/:id
 ```
 
 ## 🧪 Ejecutar Tests
@@ -266,7 +319,7 @@ docker-compose down -v
 ### Servicios Docker
 
 - **PostgreSQL**: Puerto 5432
-- **NestJS App**: Puerto 3000
+- **NestJS App**: Host 4000 → Contenedor 3000
 
 ## 📁 Estructura del Proyecto
 
@@ -361,6 +414,21 @@ nest-transactions-lab/
 2. **Emails únicos**: No se permiten emails duplicados
 3. **Rollback automático**: En caso de error, ningún dato se guarda
 4. **Liberación de recursos**: QueryRunner siempre se libera
+
+## 📘 Enseñanzas del laboratorio
+
+- **Atomicidad real con QueryRunner**: agrupa creación de certificación y participantes en una única transacción; si una inserción falla, nada se persiste.
+- **Validaciones previas**: verificar unicidad de email dentro de la transacción evita estados intermedios inconsistentes.
+- **Rollback explícito**: ante cualquier excepción, se ejecuta rollback y la base queda limpia.
+- **Networking en Docker**:
+  - En contenedores, `DB_HOST=postgres` resuelve al servicio de PostgreSQL por nombre.
+  - En ejecución local (sin Docker), usa `DB_HOST=127.0.0.1` para evitar IPv6 (::1) y resolver a localhost IPv4.
+  - La app debe escuchar en `0.0.0.0` para ser accesible desde el host.
+  - Si el puerto está en uso, mapea a otro: `127.0.0.1:4000:3000`.
+- **Diagnóstico rápido**:
+  - Logs: `docker-compose logs -f app`
+  - Estado DB: `docker exec nest-transactions-postgres pg_isready -U postgres`
+  - Salud HTTP: `curl http://localhost:4000/api/v1/certifications`
 
 ## 🤝 Contribuir
 

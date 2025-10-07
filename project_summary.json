@@ -115,7 +115,7 @@
   },
   "deployment": {
     "containerization": "Docker Compose",
-    "services": ["PostgreSQL (puerto 5432)", "NestJS App (puerto 3000)"],
+    "services": ["PostgreSQL (puerto 5432)", "NestJS App (host 4000 -> contenedor 3000)"],
     "volumes": "Persistencia de datos de PostgreSQL",
     "networks": "Red interna para comunicación entre servicios"
   },
