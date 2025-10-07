@@ -28,7 +28,7 @@ export class Person {
   @Column({ type: 'varchar', length: 100 })
   role: string;
 
-  @Column({ type: 'varchar', length: 36 })
+  @Column({ type: 'uuid' })
   certificationId: string;
 
   // Relación muchos a uno con Certification

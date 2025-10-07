@@ -7,7 +7,12 @@ import { CertificationSeed } from './certification.seed';
  * Ejecuta los seeds de datos iniciales para el laboratorio
  */
 async function runSeeds() {
-  const dataSource = new DataSource(typeOrmConfig.options);
+  // Forzamos synchronize=true para crear el esquema al ejecutar seeds
+  const dataSource = new DataSource({
+    ...typeOrmConfig.options,
+    synchronize: true,
+    logging: true,
+  });
   
   try {
     await dataSource.initialize();
