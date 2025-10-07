@@ -1,0 +1,181 @@
+{
+  "project": {
+    "name": "Laboratorio de Transacciones NestJS - Sistema de Certificaciones",
+    "description": "Laboratorio completo y funcional sobre transacciones de base de datos usando NestJS y TypeORM con PostgreSQL. Demuestra el manejo de transacciones ACID en un sistema real de emisión de certificados.",
+    "version": "1.0.0",
+    "type": "laboratory",
+    "category": "backend",
+    "status": "completed"
+  },
+  "technologies": {
+    "framework": "NestJS",
+    "language": "TypeScript",
+    "database": "PostgreSQL",
+    "orm": "TypeORM",
+    "containerization": "Docker",
+    "testing": "Jest",
+    "validation": "class-validator",
+    "transformation": "class-transformer"
+  },
+  "architecture": {
+    "pattern": "Modular Architecture",
+    "database_pattern": "Relational Database",
+    "transaction_management": "QueryRunner with ACID properties",
+    "api_design": "RESTful API",
+    "validation": "DTO-based validation"
+  },
+  "core_features": [
+    "Transacciones ACID con QueryRunner",
+    "Rollback automático en caso de errores",
+    "Validación de datos con DTOs",
+    "Relaciones uno-a-muchos entre entidades",
+    "Simulación de errores para demostrar rollback",
+    "Tests unitarios y end-to-end",
+    "Seeds de datos iniciales",
+    "Dockerización completa"
+  ],
+  "entities": [
+    {
+      "name": "Certification",
+      "description": "Representa una certificación emitida por la plataforma",
+      "fields": ["id", "title", "institution", "issueDate", "description", "status", "createdAt", "updatedAt"],
+      "relationships": "One-to-Many with Person"
+    },
+    {
+      "name": "Person",
+      "description": "Representa una persona que participa en una certificación",
+      "fields": ["id", "fullName", "email", "role", "certificationId", "createdAt", "updatedAt"],
+      "relationships": "Many-to-One with Certification"
+    }
+  ],
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/api/v1/certifications",
+      "description": "Crear certificación con personas (caso exitoso)",
+      "purpose": "Demostrar transacción exitosa"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/certifications/simulate-error",
+      "description": "Crear certificación simulando error (demostrar rollback)",
+      "purpose": "Demostrar rollback automático"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/certifications",
+      "description": "Obtener todas las certificaciones",
+      "purpose": "Consultar datos"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/certifications/:id",
+      "description": "Obtener certificación específica",
+      "purpose": "Consultar datos específicos"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/persons",
+      "description": "Obtener todas las personas",
+      "purpose": "Consultar participantes"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/persons/certification/:id",
+      "description": "Obtener personas de una certificación",
+      "purpose": "Consultar participantes por certificación"
+    }
+  ],
+  "scenarios": [
+    {
+      "name": "Caso Exitoso",
+      "description": "Crear una certificación con 5 participantes exitosamente",
+      "expected_result": "Certificación y todas las personas creadas correctamente",
+      "status": "implemented"
+    },
+    {
+      "name": "Caso de Error",
+      "description": "Simular fallo en la 5ta persona y verificar rollback",
+      "expected_result": "Ningún dato guardado, rollback automático ejecutado",
+      "status": "implemented"
+    }
+  ],
+  "testing": {
+    "unit_tests": "CertificationService con mocks de QueryRunner",
+    "e2e_tests": "API endpoints con base de datos real",
+    "coverage": "Tests para escenarios exitosos y de error",
+    "test_data": "Datos de ejemplo del sistema de certificaciones"
+  },
+  "database": {
+    "type": "PostgreSQL",
+    "connection": "TypeORM DataSource",
+    "transaction_management": "QueryRunner con control manual",
+    "relationships": "Foreign Keys con eliminación en cascada",
+    "seeds": "Datos iniciales para demostración"
+  },
+  "deployment": {
+    "containerization": "Docker Compose",
+    "services": ["PostgreSQL (puerto 5432)", "NestJS App (puerto 3000)"],
+    "volumes": "Persistencia de datos de PostgreSQL",
+    "networks": "Red interna para comunicación entre servicios"
+  },
+  "documentation": {
+    "readme": "README.md con instrucciones completas",
+    "api_examples": "Ejemplos de curl para todos los endpoints",
+    "diagrams": "Diagramas de flujo de transacciones en Mermaid",
+    "architecture": "Documentación de arquitectura y patrones"
+  },
+  "learning_objectives": [
+    "Comprender transacciones ACID en bases de datos",
+    "Implementar QueryRunner para control manual de transacciones",
+    "Manejar rollback automático en casos de error",
+    "Validar atomicidad de operaciones complejas",
+    "Crear tests que demuestren comportamiento de transacciones",
+    "Dockerizar aplicaciones NestJS con PostgreSQL"
+  ],
+  "key_concepts": [
+    "Atomicidad: Todo o nada en las operaciones",
+    "Consistencia: Datos siempre en estado válido",
+    "Aislamiento: Transacciones independientes",
+    "Durabilidad: Cambios permanentes después de commit",
+    "QueryRunner: Manejo manual de conexiones y transacciones",
+    "Rollback: Cancelación automática en caso de error",
+    "DTOs: Validación de datos de entrada",
+    "Relaciones: Foreign Keys y eliminación en cascada"
+  ],
+  "file_structure": {
+    "src/": "Código fuente de la aplicación",
+    "src/entities/": "Entidades TypeORM (Certification, Person)",
+    "src/modules/": "Módulos NestJS (certification, person)",
+    "src/config/": "Configuración de TypeORM",
+    "src/database/seeds/": "Datos iniciales",
+    "test/": "Tests end-to-end",
+    "docs/": "Documentación y diagramas",
+    "docker/": "Configuración Docker"
+  },
+  "commands": {
+    "development": "npm run start:dev",
+    "testing": "npm run test && npm run test:e2e",
+    "seeds": "npm run seed:run",
+    "docker": "docker-compose up -d",
+    "build": "npm run build"
+  },
+  "progress": {
+    "structure": "completed",
+    "entities": "completed",
+    "services": "completed",
+    "controllers": "completed",
+    "transactions": "completed",
+    "tests": "completed",
+    "documentation": "completed",
+    "docker": "completed",
+    "overall": "100%"
+  },
+  "next_steps": [
+    "Ejecutar docker-compose up -d",
+    "Probar endpoints con curl",
+    "Verificar rollback automático",
+    "Ejecutar tests unitarios y e2e",
+    "Explorar logs de transacciones"
+  ]
+}

@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  # Base de datos PostgreSQL para el laboratorio
+  postgres:
+    image: postgres:15-alpine
+    container_name: nest-transactions-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: certifications_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Scripts de inicialización
+      - ./docker/init:/docker-entrypoint-initdb.d
+    networks:
+      - nest-network
+
+  # Aplicación NestJS
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nest-transactions-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres123
+      - DB_DATABASE=certifications_db
+    depends_on:
+      - postgres
+    networks:
+      - nest-network
+    volumes:
+      # Para desarrollo en caliente
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
+
+networks:
+  nest-network:
+    driver: bridge
